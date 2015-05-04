@@ -2,6 +2,7 @@
 
 import os
 
+from london.config import config
 from london.text import Text
 from elasticsearch.helpers import bulk
 from clint.textui.progress import bar
@@ -25,6 +26,16 @@ class Corpus:
             }
         }
     }
+
+
+    @classmethod
+    def from_env(cls):
+
+        """
+        Get an instance for the ENV-defined corpus.
+        """
+
+        return cls(config['corpus'])
 
 
     def __init__(self, path):
