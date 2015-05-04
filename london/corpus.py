@@ -163,7 +163,8 @@ class Corpus:
             self.es_stream_docs(),
             raise_on_exception=False,
             doc_type=self.es_doc_type,
-            index=self.es_index
+            index=self.es_index,
+            chunk_size=100
         )
 
         # Commit the index.
