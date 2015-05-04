@@ -1,0 +1,9 @@
+ipython
+redis
+rq
+rq-dashboard
+click
+psycopg2
+peewee
+elasticsearch
+clint
