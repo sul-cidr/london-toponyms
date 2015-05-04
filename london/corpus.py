@@ -5,7 +5,7 @@ import os
 from london.config import config
 from london.text import Text
 from elasticsearch.helpers import bulk
-from clint.textui.progress import bar
+from blessings import Terminal
 
 
 class Corpus:
@@ -22,7 +22,8 @@ class Corpus:
         },
         'properties': {
             'body': {
-                'type': 'string'
+                'type': 'string',
+                'term_vector': 'with_positions_offsets'
             }
         }
     }
@@ -169,3 +170,52 @@ class Corpus:
 
         # Commit the index.
         config.es.indices.flush(self.es_index)
+
+
+    @classmethod
+    def es_query(cls, toponym):
+
+        """
+        Search for a toponym.
+
+        Args:
+            toponym (str): The placename.
+        """
+
+        results = config.es.search(
+            cls.es_index,
+            cls.es_doc_type,
+            body={
+                'size': 10,
+                'fields': [],
+                'query': {
+                    'match_phrase': {
+                        'body': {
+                            'query': toponym,
+                            'slop': 3
+                        }
+                    }
+                },
+                # TODO|dev
+                'highlight': {
+                    'pre_tags': ['\033[1m'],
+                    'post_tags': ['\033[0m'],
+                    'fields': {
+                        'body': {}
+                    }
+                }
+            }
+        )
+
+        # TODO|dev
+        term = Terminal()
+
+        # Total hits.
+        hits = str(results['hits']['total'])+' docs'
+        print(term.standout_green(hits))
+
+        # Hit highlights.
+        for hit in results['hits']['hits']:
+            print('\n'+term.standout_cyan(hit['_id']))
+            for hl in hit['highlight']['body']:
+                print(hl)
