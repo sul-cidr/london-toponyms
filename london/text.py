@@ -38,4 +38,4 @@ class Text:
         Returns: dict
         """
 
-        pass
+        return {}

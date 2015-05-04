@@ -1,5 +1,6 @@
 ipython
 anyconfig
+PyYAML
 redis
 rq
 rq-dashboard

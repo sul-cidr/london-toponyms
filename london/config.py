@@ -26,7 +26,7 @@ class Config:
 
         return cls([
             os.path.join(os.path.dirname(__file__), 'london.yml'),
-            '~/london.yml',
+            '~/.london.yml',
         ])
 
 

@@ -3,6 +3,8 @@
 import os
 
 from london.text import Text
+from elasticsearch.helpers import bulk
+from clint.textui.progress import bar
 
 
 class Corpus:
@@ -23,6 +25,58 @@ class Corpus:
             }
         }
     }
+
+
+    def __init__(self, path):
+
+        """
+        Normalize the corpus path.
+
+        Args:
+            path (str): The corpus base path.
+        """
+
+        self.path = os.path.abspath(path)
+
+
+    def file_paths(self):
+
+        """
+        Generate fully paths for each file.
+
+        Yields:
+            str: The next file path.
+        """
+
+        for dirname, _, filenames in os.walk(self.path):
+            for filename in filenames:
+                yield os.path.join(dirname, filename)
+
+
+    @property
+    def file_count(self):
+
+        """
+        How many texts are in the corpus?
+
+        Returns:
+            int: The total count.
+        """
+
+        return sum(1 for _ in self.file_paths())
+
+
+    def texts(self):
+
+        """
+        Generate Text instances for each file.
+
+        Yields:
+            Text: The next text.
+        """
+
+        for path in self.file_paths():
+            yield Text(path)
 
 
     @classmethod
@@ -53,6 +107,7 @@ class Corpus:
 
         """
         Count the number of documents.
+
         Returns:
             int: The number of docs.
         """
@@ -72,52 +127,33 @@ class Corpus:
         cls.es_create()
 
 
-    def __init__(self, path):
+    def es_stream_docs(self):
 
         """
-        Normalize the corpus path.
-
-        Args:
-            path (str): The corpus base path.
-        """
-
-        self.path = os.path.abspath(path)
-
-
-    def file_names(self):
-
-        """
-        Generate text file names.
+        Generate Elasticsearch documents.
 
         Yields:
-            str: The next file name.
+            dict: The next document.
         """
 
-        for name in os.listdir(self.path):
-            yield name
+        for text in self.texts():
+            yield text.es_doc
 
 
-    def file_paths(self):
-
-        """
-        Generate fully paths for each file.
-
-        Yields:
-            str: The next file path.
-        """
-
-        for name in self.file_names():
-            yield os.path.join(self.path, name)
-
-
-    def texts(self):
+    def es_insert(self):
 
         """
-        Generate Text instances for each file.
-
-        Yields:
-            Text: The next text.
+        Insert Elasticsearch documents.
         """
 
-        for path in self.file_paths():
-            yield Text(path)
+        # Batch-insert the documents.
+        bulk(
+            config.es,
+            self.es_stream_docs(),
+            raise_on_exception=False,
+            doc_type=self.es_doc_type,
+            index=self.es_index
+        )
+
+        # Commit the index.
+        config.es.indices.flush(self.es_index)
