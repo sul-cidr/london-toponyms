@@ -1,32 +1,35 @@
 
 
+import os
+
+
 class Text:
 
 
-    @classmethod
-    def from_file(cls, path):
+    def __init__(self, path):
 
         """
-        Create a text from a file.
+        Store the file path.
 
         Args:
             path (str): The file path.
         """
 
-        with open(path, 'r', errors='replace') as f:
-            return cls(f.read())
+        self.path = path
 
 
-    def __init__(self, text):
+    @property
+    def body(self):
 
         """
-        Store the raw text.
+        Read the file contents.
 
-        Args:
-            text (str): The text string.
+        Returns:
+            str: The text body.
         """
 
-        self.text = text
+        with open(self.path, 'r', errors='replace') as f:
+            return f.read()
 
 
     @property
@@ -38,4 +41,7 @@ class Text:
         Returns: dict
         """
 
-        return {}
+        return {
+            '_id': os.path.basename(self.path),
+            'body': self.body
+        }
