@@ -1,3 +1,3 @@
-# London placename extraction
+### London toponyms
 
-Finding references to locations in London.
+Finding references to place names in London in literary texts
