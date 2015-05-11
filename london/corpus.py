@@ -6,6 +6,7 @@ from london.config import config
 from london.text import Text
 from elasticsearch.helpers import bulk
 from blessings import Terminal
+from clint.textui.progress import bar
 
 
 class Corpus:
@@ -148,7 +149,7 @@ class Corpus:
             dict: The next document.
         """
 
-        for text in self.texts():
+        for text in bar(self.texts(), expected_size=self.file_count):
             yield text.es_doc
 
 
