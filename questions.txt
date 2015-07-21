@@ -1,3 +1,0 @@
-
-why does config.from_env() read two config files, local and in ~?
-
