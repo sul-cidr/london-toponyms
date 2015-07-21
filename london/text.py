@@ -40,8 +40,19 @@ class Text:
 
         Returns: dict
         """
-
+        # figuring out how this works
+        p = os.path.basename(self.path)
+        print(p)
         return {
             '_id': os.path.basename(self.path),
             'body': self.body
+        }
+    
+
+    def paragraphs(self):
+        """ 
+        produce paragraphs from a text
+        """
+        return {
+
         }

@@ -220,3 +220,5 @@ class Corpus:
             print('\n'+term.standout_cyan(hit['_id']))
             for hl in hit['highlight']['body']:
                 print(hl)
+        
+        return results
