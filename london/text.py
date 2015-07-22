@@ -2,6 +2,7 @@
 
 import os
 import re
+import hashlib
 
 
 class Text:
@@ -43,6 +44,21 @@ class Text:
         """
 
         return os.path.basename(self.path)
+
+
+    def es_paragraph_id(self, offset):
+
+        """
+        Provide an Elasticsearch id for an individual paragraph.
+
+        Args:
+            offset (int): A paragraph offset.
+
+        Returns: str
+        """
+
+        name = (self.es_id+str(offset)).encode('utf8')
+        return hashlib.sha1(name).hexdigest()
 
 
     def paragraphs(self):

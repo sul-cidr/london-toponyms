@@ -22,6 +22,9 @@ class Corpus:
             'store': True
         },
         'properties': {
+            'text_id': {
+                'type': 'string'
+            },
             'paragraph_id': {
                 'type': 'integer'
             },
@@ -156,7 +159,8 @@ class Corpus:
             for i, paragraph in enumerate(text.paragraphs()):
 
                 yield {
-                    '_id': text.es_id,
+                    '_id': text.es_paragraph_id(i),
+                    'text_id': text.es_id,
                     'paragraph_id': i,
                     'text': paragraph
                 }
@@ -183,7 +187,7 @@ class Corpus:
 
 
     @classmethod
-    def es_query(cls, toponym):
+    def es_query(cls, toponym, size=100, frag_size=1000):
 
         """
         Search for a toponym.
@@ -196,11 +200,11 @@ class Corpus:
             cls.es_index,
             cls.es_doc_type,
             body={
-                'size': 10,
+                'size': 100,
                 'fields': [],
                 'query': {
                     'match_phrase': {
-                        'body': {
+                        'text': {
                             'query': toponym,
                             'slop': 3
                         }
@@ -211,10 +215,24 @@ class Corpus:
                     'pre_tags': ['\033[1m'],
                     'post_tags': ['\033[0m'],
                     'fields': {
-                        'body': {}
+                        'text': {
+                            'fragment_size': frag_size,
+                            'number_of_fragments': 1
+                        }
                     }
                 }
             }
         )
 
-        # TODO
+        # TODO|dev
+        term = Terminal()
+
+        # Total hits.
+        hits = str(results['hits']['total'])+' docs'
+        print(term.standout_green(hits))
+
+        # Hit highlights.
+        for hit in results['hits']['hits']:
+            print('\n'+term.standout_cyan(hit['_id']))
+            for hl in hit['highlight']['text']:
+                print(hl)
