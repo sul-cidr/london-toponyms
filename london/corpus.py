@@ -22,7 +22,10 @@ class Corpus:
             'store': True
         },
         'properties': {
-            'body': {
+            'paragraph_id': {
+                'type': 'integer'
+            },
+            'text': {
                 'type': 'string',
                 'term_vector': 'with_positions_offsets'
             }
@@ -55,7 +58,7 @@ class Corpus:
     def file_paths(self):
 
         """
-        Generate fully paths for each file.
+        Generate full paths for each file.
 
         Yields:
             str: The next file path.
@@ -150,7 +153,13 @@ class Corpus:
         """
 
         for text in bar(self.texts(), expected_size=self.file_count):
-            yield text.es_doc
+            for i, paragraph in enumerate(text.paragraphs()):
+
+                yield {
+                    '_id': text.es_id,
+                    'paragraph_id': i,
+                    'text': paragraph
+                }
 
 
     def es_insert(self):
@@ -208,17 +217,4 @@ class Corpus:
             }
         )
 
-        # TODO|dev
-        term = Terminal()
-
-        # Total hits.
-        hits = str(results['hits']['total'])+' docs'
-        print(term.standout_green(hits))
-
-        # Hit highlights.
-        for hit in results['hits']['hits']:
-            print('\n'+term.standout_cyan(hit['_id']))
-            for hl in hit['highlight']['body']:
-                print(hl)
-        
-        return results
+        # TODO

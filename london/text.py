@@ -1,6 +1,7 @@
 
 
 import os
+import re
 
 
 class Text:
@@ -33,26 +34,25 @@ class Text:
 
 
     @property
-    def es_doc(self):
+    def es_id(self):
 
         """
-        Provide a document for Elasticsearch.
+        Provide a id for Elasticsearch.
 
-        Returns: dict
+        Returns: str
         """
-        # figuring out how this works
-        p = os.path.basename(self.path)
-        print(p)
-        return {
-            '_id': os.path.basename(self.path),
-            'body': self.body
-        }
-    
+
+        return os.path.basename(self.path)
+
 
     def paragraphs(self):
-        """ 
-        produce paragraphs from a text
-        """
-        return {
 
-        }
+        """
+        Generate paragraphs from the text.
+
+        Yields:
+            str: The next paragraph.
+        """
+
+        for match in re.split('\n{2}', self.body):
+            yield match
