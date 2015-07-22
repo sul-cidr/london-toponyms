@@ -1,6 +1,7 @@
 ---
 
 corpus: XXX
+toponyms: XXX
 
 redis:
   host: localhost

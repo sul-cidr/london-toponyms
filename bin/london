@@ -4,6 +4,9 @@
 import os
 import click
 
+from london.config import config
+from london.jobs import query
+
 
 @click.group()
 def london():
@@ -12,7 +15,14 @@ def london():
 
 @london.command()
 def queue_queries():
-    click.echo('test')
+
+    """
+    Queue a query job for each toponym.
+    """
+
+    with open(config["toponyms"], 'r') as fh:
+        for toponym in fh:
+            config.rq.enqueue(query, toponym)
 
 
 if __name__ == '__main__':

@@ -34,5 +34,4 @@ def query(toponym, size=10000, frag_size=5000):
     })
 
     for hit in results['hits']['hits']:
-        #snippet = hit['highlight']['text'][0]
         print(hit)
